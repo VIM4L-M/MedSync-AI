@@ -50,5 +50,5 @@ async function modelCall(input) {
 
 const res = await modelCall("azithromycin is safe ??");
 const res2 = await modelCall("What is my last questaion ?");
-console.log(res)
+console.log(res);
 console.log(res2);
