@@ -7,8 +7,14 @@ export const useMedicine = () => useContext(MedicineContext);
 
 export const MedicineProvider = ({ children }) => {
   const [localuser, setLocaluser] = useState(() => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
+    try {
+      const stored = localStorage.getItem("user"); 
+      if (!stored || stored === "undefined") return null;
+      return JSON.parse(stored);
+    } catch (e) {
+      console.error("Error parsing localStorage user:", e);
+      return null;
+    }
   });
     
    const [medication, setMedication] = useState({
