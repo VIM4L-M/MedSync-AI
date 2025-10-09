@@ -1,5 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useSocket } from './context/socketContext';
+import NotificationContainer from './components/NotificationToast';
 
 import MedicationEntryForm from './pages/addMedication.jsx'
 import Login from "./pages/Login";
@@ -13,9 +15,10 @@ import HealthProfile from "./pages/HealthProfile";
 
 
 function App() {
+  const { notifications, removeNotification } = useSocket();
+
   return (
     <>
-    
     <Routes>
       <Route path="/" element={<Navigate to="/landing" />} />
       <Route path="/landing" element={<LandingPage />} />
@@ -34,6 +37,12 @@ function App() {
         <Route path="/health" element={<HealthProfile />} />
       <Route path="/addMedication" element={<MedicationEntryForm />} />
     </Routes>
+    
+    {/* Global notification toasts */}
+    <NotificationContainer 
+      notifications={notifications} 
+      onRemoveNotification={removeNotification}
+    />
     </>
   )
 }
