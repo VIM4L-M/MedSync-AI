@@ -15,7 +15,7 @@ import HealthProfile from "./pages/HealthProfile";
 import OAuthCallback from "./pages/OAuthCallback";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
-
+import ReportChat from "./pages/ReportChat";
 
 
 function App() {
@@ -36,6 +36,7 @@ function App() {
       <Route path="/oauth2callback" element={<OAuthCallback />} />
       <Route path="/analytics" element={<Analytics />} />
       <Route path="/reports" element={<Reports />} />
+      <Route path="/reportChat" element={<ReportChat />} />
     </Routes>
     
     {/* Global notification toasts */}
