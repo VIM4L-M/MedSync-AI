@@ -1,8 +1,6 @@
 import Medication from "../models/medicineModel.js";
 
 import { addMedicineToGoogleCalendar } from "../utils/googleCalendar.js";
-
-
 import startNotificationScheduler from "./notificationController.js";
 
 export const addMedication = async (req, res) => {
@@ -41,6 +39,7 @@ export const addMedication = async (req, res) => {
       adherenceHistory,
       notes
     });
+    
     await sampleMedicine.save();
 
     // Schedule in Google Calendar
