@@ -68,9 +68,9 @@ const Analytics = ({ userId }) => {
         📊 Medication Analytics
       </h2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="flex flex-row flex-wrap gap-10 justify-center items-start">
         {/* Pie Chart */}
-        <div className="flex flex-col items-center bg-slate-900 rounded-3xl p-6 shadow-xl border border-slate-800 hover:shadow-orange-400/40 transition transform hover:-translate-y-1 hover:scale-105">
+        <div className="flex-1 min-w-[320px] max-w-[500px] flex flex-col items-center bg-slate-900 rounded-3xl p-6 shadow-xl border border-slate-800 hover:shadow-orange-400/40 transition transform hover:-translate-y-1 hover:scale-105">
           <h3 className="text-xl font-semibold mb-4 text-slate-200">
             Overall Adherence
           </h3>
@@ -118,7 +118,7 @@ const Analytics = ({ userId }) => {
         </div>
 
         {/* Bar Chart */}
-        <div className="flex flex-col items-center bg-slate-900 rounded-3xl p-6 shadow-xl border border-slate-800 hover:shadow-blue-400/40 transition transform hover:-translate-y-1 hover:scale-105">
+        <div className="flex-1 min-w-[320px] max-w-[500px] flex flex-col items-center bg-slate-900 rounded-3xl p-6 shadow-xl border border-slate-800 hover:shadow-blue-400/40 transition transform hover:-translate-y-1 hover:scale-105">
           <h3 className="text-xl font-semibold mb-4 text-slate-200">
             Weekly Medication Trend
           </h3>
