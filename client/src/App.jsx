@@ -15,6 +15,11 @@ import HealthProfile from "./pages/HealthProfile";
 import OAuthCallback from "./pages/OAuthCallback";
 import Analytics from "./pages/Analytics";
 
+import OAuthCallback from "./pages/OAuthCallback";
+import Analytics from "./pages/Analytics";
+import Reports from "./pages/Reports";
+
+
 
 function App() {
   const { notifications, removeNotification } = useSocket();
@@ -33,6 +38,7 @@ function App() {
       <Route path="/addMedication" element={<MedicationEntryForm />} />
       <Route path="/oauth2callback" element={<OAuthCallback />} />
       <Route path="/analytics" element={<Analytics />} />
+      <Route path="/reports" element={<Reports />} />
     </Routes>
     
     {/* Global notification toasts */}

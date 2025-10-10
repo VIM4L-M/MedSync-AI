@@ -15,6 +15,9 @@ import reportRoutes from "./routes/reportRoutes.js";
 
 import oauthRoutes from "./routes/oauth.js";
 import analyticsRoutes from "./routes/analytics.js";
+import reportRoutes from "./routes/reportRoutes.js";
+import authMiddleware from "./middlewares/authMiddleware.js";
+
 
 import { fileURLToPath } from 'url';
 
@@ -60,6 +63,11 @@ app.use("/api/oauth", oauthRoutes);
 app.use("/api/report", reportRoutes);
 
 app.use("/api/analytics", analyticsRoutes);
+
+app.use("/api/oauth", oauthRoutes);
+
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/report", reportRoutes);
 
 // Test route
 app.get("/", (req, res) => {
