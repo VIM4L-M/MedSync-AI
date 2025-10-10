@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useMedicine } from '../context/medicationContext.jsx';
 import { useNotification } from '../context/notificationContext.jsx';
+import Analytics from "./Analytics";
 
 export default function Dashboard() {
 
@@ -19,7 +20,26 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [streak, setStreak] = useState(12);  //  will add it for afterwards(streak = number of days for 100% adherence)
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [linked, setLinked] = useState(false);
 
+  const [currentUser, setCurrentUser] = useState(null);
+
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    console.log("storedUser: ",storedUser);
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        console.log("Loaded currentUser:", parsedUser);
+        setCurrentUser(parsedUser);
+      } catch (error) {
+        console.error("Error parsing stored user:", error);
+      }
+    } else {
+      console.warn("No user found in localStorage");
+    }
+  }, []);
 
 
 
@@ -36,7 +56,7 @@ export default function Dashboard() {
     try {
       const data = await todayMedication();
       console.log('Fetched today\'s medications:', data);
-      setMedications(data?.data);
+      setMedications(Array.isArray(data) ? data : data?.data || []);
       console.log("medications",medications)
     } catch (error) {
       console.error('Error fetching medications:', error);
@@ -47,6 +67,10 @@ export default function Dashboard() {
 
 
 
+
+
+
+  
   const filterMedications = () => {
     if (activeFilter === 'all') {
       setFilteredMeds(medications);
@@ -115,6 +139,43 @@ export default function Dashboard() {
     window.location.href = '/';
   };
 
+  const handleConnectCalendar = async () => {
+    try {
+      const localuser = JSON.parse(localStorage.getItem("user"));
+      if (!localuser?.id) return alert("Please log in first");
+
+      // Go directly to the backend OAuth login endpoint 
+      // oAuth does not work with fetch you need to redirect
+      window.location.href = `http://localhost:8080/api/oauth/login?userId=${localuser.id}`;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    console.log("debug 1");
+    const userId = user?.id || user?._id; 
+    console.log("debug 2");
+    if (!userId) {
+      console.log("userId:", userId);
+      console.warn("User ID not found in localStorage!");
+      return;
+    }
+    console.log("debug 3");
+    fetch(`http://localhost:8080/api/oauth/calendar/status/${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.linked) {
+          setLinked(true);
+          setAccount(data.account);
+        } else {
+          setLinked(false);
+        }
+      });
+      console.log("debug 4");
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       
@@ -147,10 +208,18 @@ export default function Dashboard() {
               <MessageSquare className="w-5 h-5" />
               <span>AI Assistant</span>
             </button>
-            <button onClick={() => window.location.href = '/settings'} className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-slate-800/50 text-slate-400 hover:text-white transition-all">
+            <button onClick={() => window.location.href = '/health'} className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-slate-800/50 text-slate-400 hover:text-white transition-all">
               <Settings className="w-5 h-5" />
               <span>Health Profile</span>
             </button>
+            {linked ? (
+              <p className="text-green-500">✅ Linked to {account}</p>
+              ) : (
+              <button onClick={handleConnectCalendar} className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl hover:bg-slate-800/50 text-slate-400 hover:text-white transition-all">
+                <Calendar className="w-5 h-5" />
+                <span>Connect Google Calendar</span>
+                </button>
+            )}
           </nav>
 
           <div className="absolute bottom-6 left-6 right-6">
@@ -228,6 +297,13 @@ export default function Dashboard() {
             <p className="text-xs text-slate-500 mt-1">Great progress!</p>
           </div>
         </div>
+
+        {/* Analytics Section */}
+        {currentUser && (
+          <div className="mt-8">
+            <Analytics userId={currentUser?.id || currentUser?._id} />
+          </div>
+        )}
 
         {/* Main Grid */}
         <div className="grid lg:grid-cols-3 gap-6">

@@ -4,6 +4,6 @@ import generateReport from '../api/reportController.js';
 
 const router = express.Router();
 
-router.post("/report", authMiddleware, generateReport);
+router.post("/", generateReport);
 
 export default router;
