@@ -67,10 +67,18 @@ export default async function emergencyModelHandler(req, res) {
   try {
     const input = req.body?.input || "Is this an emergency situation ?";
 
+    const user = req.body?.user || req.body?.localuser;
+    if (!user || !user.id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "User data is required in request body" 
+      });
+    }
+
     //call the past two data from the database
     let pastData = [];
     try {
-      pastData = await Conversation.find({ user: req.user.id })
+      pastData = await Conversation.find({ user: user.id })
         .sort({ createdAt: -1 }) // latest first
         .limit(2);
       console.log("Past Data loaded...");
@@ -116,7 +124,7 @@ export default async function emergencyModelHandler(req, res) {
     const result = await chain.call({ input });
 
     try {
-      await Conversation.create({ summary, input, output: result.text, model: "emergency_model", user: req.user.id});
+      await Conversation.create({ summary, input, output: result.text, model: "emergency_model", user: user.id});
     } catch (err) {
       console.error("Error saving conversation:", err);
     }

@@ -30,9 +30,21 @@ try {
 }
 
 // define the memory
+const summaryPrompt = PromptTemplate.fromTemplate(`
+Progressively summarize the conversation. Keep the summary under 25 words and return only the summary.
+
+Current summary:
+{summary}
+
+New lines of conversation:
+{new_lines}
+
+New summary:`);
+
 const memory = new ConversationSummaryMemory({
   memoryKey: "chat_history",
   llm: chatModel,
+  prompt: summaryPrompt, // <-- Add this line
 });
 
 export default async function medicalModelHandler(req, res) {
@@ -46,10 +58,18 @@ export default async function medicalModelHandler(req, res) {
   try {
     const input = req.body?.input || "What is my medical status ?";
 
+    const user = req.body?.user || req.body?.localuser;
+    if (!user || !user.id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "User data is required in request body" 
+      });
+    }
+
     //call the past two data from the database
     let pastData = [];
     try {
-      pastData = await Conversation.find({ user: req.user.id })
+      pastData = await Conversation.find({ user: user.id })
         .sort({ createdAt: -1 }) // latest first
         .limit(2);
       console.log("Past Data loaded...");
@@ -87,7 +107,7 @@ export default async function medicalModelHandler(req, res) {
     const result = await chain.call({ input });
 
     try {
-      await Conversation.create({ summary, input, output: result.text, model: "medical_model", user: req.user.id});
+      await Conversation.create({ summary, input, output: result.text, model: "medical_model", user: user.id});
     } catch (err) {
       console.error("Error saving conversation:", err);
     }
