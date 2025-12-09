@@ -1,157 +1,198 @@
-# Alchemist's Grimoire (Insight-X)
+# MedSync AI
 
-## 🧙‍♂️ Introduction
-
-**Alchemist's Grimoire** is a modern solution to a timeless problem: medication adherence. A staggering 50% of medications for chronic diseases are not taken as prescribed, leading to severe health consequences. Our application tackles this by providing an intelligent, user-friendly platform for managing medications, tracking adherence, and gaining valuable health insights through AI-powered assistants.
-
-This repository is a monorepo containing both the client-side (frontend) and server-side (backend) of the application.
+A full-stack, open-source medication adherence assistant that combines a modern React frontend with an Express.js backend, AI health agents, notifications, and report analysis. Built for real-world usability and ready for contributors through Social Winter of Code.
 
 ---
 
-## 🚀 Overall Project Flow
+## 🚀 Why this project & how to contribute
 
-The application follows a classic client-server architecture. The user interacts with the React-based frontend, which makes API calls to the Express.js backend. The backend handles business logic, interacts with the MongoDB database, and communicates with external AI services.
-
-Here's a simplified flow:
-
-1.  **Authentication:** The user signs up or logs in. The backend verifies the credentials and returns a JWT token.
-2.  **Dashboard:** The frontend uses the JWT token to fetch the user's medication schedule and adherence statistics from the backend.
-3.  **Medication Management:** The user can add new medications. The frontend sends the medication details to the backend, which stores them in the database.
-4.  **Notifications:** The backend includes a scheduler that creates and sends notifications to the user about upcoming or missed doses.
-5.  **AI Agents:** The user can chat with various AI health assistants. The frontend sends the user's query to a specific backend endpoint, which then uses LangChain and a designated AI model (like Google's Generative AI or Groq) to generate a response.
-6.  **Report Generation and Analysis**: Users can generate health reports, upload them for analysis, and even chat with the analyzed reports.
+- **Open for contributors:** We welcome newcomers and experienced contributors alike. Good first issues, docs improvements, and feature work are all appreciated.
+- **Real impact:** Medication non-adherence affects health outcomes globally. MedSync AI provides reminders, scheduling, AI guidance, and health report analysis to help users stay on track.
+- **Modern stack:** React + Vite + Tailwind on the frontend; Node.js + Express + MongoDB + Socket.IO + LangChain integrations on the backend.
+- **Clear pathways:** Pick an issue, discuss in comments, and submit a PR. If you’re unsure where to start, open a discussion or ask for guidance.
 
 ---
 
-## Client-Side
+## 🧭 Project overview
 
-The client-side is a modern, responsive React application built with Vite. It provides a beautiful and intuitive interface for users to manage their health.
+MedSync AI is a monorepo with two main parts:
 
-### ✨ Features
+- **client/** — React app (Vite, Tailwind) for the user experience: auth, dashboard, medication management, notifications, AI agents, report upload/chat, Google Calendar sync.
+- **server/** — Express.js API with JWT auth, medication CRUD, notification scheduling (with Socket.IO), AI agent endpoints (LangChain, Groq/Gemini), PDF parsing, and Google Calendar integration.
 
-* **Secure Authentication:** JWT-based login and signup.
-* **Intuitive Dashboard:** At-a-glance view of today's medication schedule, adherence rate, and streak.
-* **Medication Management:** Easily add, view, and update medication schedules.
-* **Smart Notifications:** A dedicated page to view all medication reminders and alerts.
-* **AI-Powered Health Agents:** A multi-agent chat interface to interact with specialized AI assistants for medical knowledge, personal health tracking, medication information, and emergency triage.
-* **Health Profile:** A section for users to manage their personal health information.
-* **Report Analysis**: Upload health reports for AI-powered analysis.
-* **Report Chat**: Chat with your uploaded and analyzed health reports.
-* **Google Calendar Sync**: Sync your medication schedule with your Google Calendar.
-
-### 🛠️ Tech Stack
-
-* **Framework:** React
-* **Build Tool:** Vite
-* **Styling:** Tailwind CSS
-* **Routing:** React Router
-* **HTTP Client:** Axios
-* **State Management:** React Context API
-* **Real-time Communication:** Socket.IO Client
-* **Icons:** Lucide React
-* **Charting:** Recharts
-
-### 🚀 Getting Started
-
-1.  **Navigate to the client directory:**
-    ```bash
-    cd client
-    ```
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-3.  **Run the development server:**
-    ```bash
-    npm run dev
-    ```
-    The application will be available at `http://localhost:5173`.
-
-### 📂 Project Structure & Flow
-
-The client-side is organized into pages, components, and contexts, following modern React best practices.
-
-* `src/pages`: Contains the main views of the application, such as `Dashboard.jsx`, `Login.jsx`, `addMedication.jsx`, and `agents.jsx`.
-* `src/components`: Contains reusable UI components like `ProtectedRoute.jsx` and `Navbar.jsx`.
-* `src/context`: Manages the application's state.
-    * `medicationContext.jsx`: Handles state related to medications, including adding new medications and fetching today's schedule.
-    * `notificationContext.jsx`: Manages notification-related state and interactions with the notification API.
-    * `socketContext.jsx`: Manages the WebSocket connection for real-time notifications.
-    * `calendarSyncContext.jsx`: Manages the Google Calendar synchronization state.
-* `src/App.jsx`: The main application component that sets up the routing using `react-router-dom`.
-
-The flow of the client application is as follows:
-
-1.  The user lands on the `landingPage.jsx`, where they can either log in or sign up.
-2.  Upon successful authentication, they are redirected to the `Dashboard.jsx`, which is a protected route.
-3.  The `Dashboard.jsx` uses the `medicationContext` to fetch and display the user's medication for the day.
-4.  From the dashboard, the user can navigate to other pages like `addMedication.jsx` to add a new medication, or `agents.jsx` to interact with the AI assistants.
-5.  The `agents.jsx` page provides a seamless multi-agent chat experience, allowing the user to switch between different specialized AI models on the fly.
+High-level flow:
+1. User authenticates (JWT).
+2. Frontend fetches schedule/adherence stats and displays a dashboard.
+3. Users add/update medications; backend stores via MongoDB.
+4. Scheduler/Socket.IO delivers reminders and notifications.
+5. AI agents answer health/medication questions via LangChain + LLMs.
+6. Users upload reports, get AI analysis, and chat with analyzed reports.
+7. Optional Google Calendar sync for medication schedules.
 
 ---
 
-## Server-Side
+## 🧩 Tech stack
 
-The server-side is a robust Node.js and Express.js application that serves as the backbone of the Alchemist's Grimoire. It handles all the business logic, from user authentication to interacting with the AI models.
+**Frontend**
+- React (Vite), Tailwind CSS, React Router
+- Axios, React Context API
+- Socket.IO Client, Recharts, Lucide React
 
-### ✨ Features
+**Backend**
+- Node.js, Express.js
+- MongoDB + Mongoose
+- JWT auth, bcrypt
+- LangChain with Groq/Gemini (LLMs)
+- Socket.IO for real-time notifications
+- Multer + pdf-parse for uploads and parsing
+- Google Calendar API (OAuth2)
+- dotenv for config
 
-* **RESTful API:** A well-structured API for all frontend functionalities.
-* **User Authentication:** Secure user registration and login using JWT.
-* **Medication Management:** CRUD operations for medications.
-* **Notification System:** A scheduler to create and manage user notifications for medication adherence, delivered in real-time via WebSockets.
-* **AI Agent Integration:** A multi-agent system that leverages LangChain to interact with various large language models (LLMs) for different health-related queries.
-* **Health Profile Management:** API endpoints for creating and updating user health profiles.
-* **Reporting:** An endpoint to generate health reports.
-* **PDF Report Analysis**: Upload and analyze PDF health reports using AI.
-* **Google Calendar Integration**: Securely syncs medication schedules to a user's Google Calendar using OAuth2.
+---
 
-### 🛠️ Tech Stack
+## 🗂️ Repository structure
 
-* **Framework:** Express.js
-* **Database:** MongoDB with Mongoose
-* **Authentication:** JSON Web Tokens (JWT), bcrypt.js
-* **AI Integration:** LangChain, `@langchain/google-genai`, `@langchain/groq`
-* **Real-time Communication:** Socket.IO
-* **PDF Parsing:** pdf-parse
-* **File Uploads:** Multer
-* **Google Calendar API:** googleapis
-* **Environment Variables:** dotenv
+```
+MedSync-AI/
+├─ client/                  # React app
+│  ├─ src/pages             # Views (Dashboard, Login, addMedication, agents, etc.)
+│  ├─ src/components        # Reusable components (ProtectedRoute, Navbar, etc.)
+│  ├─ src/context           # Contexts (medication, notification, socket, calendarSync)
+│  └─ src/App.jsx           # Routing setup
+└─ server/                  # Express API
+   ├─ src/routes            # Route definitions (e.g., medicineRoutes.js)
+   ├─ src/api               # Controllers (e.g., addMedicineController.js)
+   ├─ src/models            # Mongoose schemas (User, medicineModel, HealthProfile, ...)
+   ├─ src/utils             # AI handlers, utilities (medical_model.js, emergency_model.js, ...)
+   ├─ src/middlewares       # Middleware (authMiddleware.js)
+   └─ src/index.js          # App + Socket.IO entry point
+```
 
-### 🚀 Getting Started
+---
 
-1.  **Navigate to the server directory:**
-    ```bash
-    cd server
-    ```
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-3.  **Create a `.env` file** in the `server` directory and add the necessary environment variables (e.g., `MONGO_URI`, `JWT_SECRET`, `GROQ_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `REPORT_API`, `REPORT_TEMPLATE_ID` etc.).
-4.  **Run the development server:**
-    ```bash
-    npm run dev
-    ```
-    The server will be running on `http://localhost:8080`.
+## 🏁 Getting started
 
-### 📂 Project Structure & Flow
+### Prerequisites
+- Node.js (LTS recommended)
+- npm
+- MongoDB connection URI
+- API keys for Groq/Gemini (and any other LLM providers you use)
+- Google OAuth2 credentials (if using Calendar sync)
 
-The server-side is organized by features into routes, controllers, models, and utility functions.
+### 1) Clone
+```bash
+git clone https://github.com/tirth-patel06/MedSync-AI.git
+cd MedSync-AI
+```
 
-* `src/routes`: Defines the API endpoints. For example, `medicineRoutes.js` defines the routes for medication-related actions.
-* `src/api`: Contains the controllers that handle the logic for each route. For instance, `addMedicineController.js` contains the logic for adding a new medication to the database.
-* `src/models`: Defines the Mongoose schemas for the database collections (`User.js`, `medicineModel.js`, `HealthProfile.js`, etc.).
-* `src/utils`: Contains utility functions, most notably the AI model handlers (`medical_model.js`, `emergency_model.js`, etc.). These files use LangChain to create prompts and interact with the LLMs.
-* `src/middlewares`: Contains middleware functions, such as `authMiddleware.js` for verifying JWT tokens.
-* `src/index.js`: The entry point of the server application, which also sets up the Socket.IO server.
+### 2) Frontend setup
+```bash
+cd client
+npm install
+npm run dev
+# App at http://localhost:5173
+```
 
-The flow of the server application is as follows:
+### 3) Backend setup
+```bash
+cd server
+npm install
+# Create .env (see below) with your own keys
+npm run dev
+# Server at http://localhost:8080
+```
 
-1.  A request comes in from the client to a specific endpoint (e.g., `/api/medicine/add`).
-2.  The request is routed through `index.js` to the appropriate route file (e.g., `medicineRoutes.js`).
-3.  The route file maps the endpoint to a controller function (e.g., `addMedication`).
-4.  If the route is protected, the `authMiddleware` is called first to verify the user's JWT token.
-5.  The controller function in the `api` directory then executes the business logic. This may involve validating the request body, interacting with the database through a Mongoose model, or calling a utility function (like an AI model handler).
-6.  For AI-related requests, the controller calls one of the model handlers in the `utils` directory. This handler formats a prompt, sends it to the respective AI service (e.g., Groq), and receives the response.
-7.  Finally, the controller sends a JSON response back to the client.
+---
+
+## 🔐 Environment variables (server)
+
+Create `server/.env` with your own (do NOT commit secrets):
+```
+MONGO_URI=your_mongo_uri
+JWT_SECRET=your_jwt_secret
+
+GROQ_API_KEY=your_groq_key
+GEMINI_API_KEY=your_gemini_key
+HUGGINGFACEHUB_API_KEY=your_hf_key
+
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_REDIRECT_URI=your_redirect_uri
+```
+If you use report-generation/analysis services, add those keys/IDs here too.
+
+**Security note:** Never commit real keys. If any were exposed, rotate them immediately and scrub from history.
+
+---
+
+## 🧪 Running the apps together
+
+- Start backend first: `npm run dev` in `server/`.
+- Start frontend: `npm run dev` in `client/`.
+- Configure frontend `.env` (if applicable) to point to the backend API and Socket.IO endpoints.
+
+---
+
+## 🧠 Key features
+
+- **Secure auth:** JWT-based signup/login with protected routes.
+- **Medication management:** CRUD for meds, schedule tracking.
+- **Notifications & reminders:** Scheduler + real-time alerts via Socket.IO.
+- **AI agents:** Multi-agent chat for medication info, health guidance, triage (LangChain + LLMs).
+- **Report analysis & chat:** Upload PDFs, get AI-driven insights, and chat with analyzed reports.
+- **Google Calendar sync:** Optional calendar integration for medication schedules.
+- **Dashboard:** Today’s meds, adherence stats, and streaks at a glance.
+
+---
+
+## 🤝 How to contribute
+
+1. **Pick an issue:** Start with “good first issue” or “help wanted,” or open a discussion if unsure.
+2. **Discuss:** Comment to get assigned/confirm approach.
+3. **Fork & branch:** `git checkout -b feature/your-feature`
+4. **Code & test:** Add/adjust tests if applicable.
+5. **Lint/format:** Match project conventions (React/Tailwind/Node).
+6. **PR:** Submit with a clear description, screenshots (for UI), and testing notes.
+
+Need ideas?
+- Improve docs and onboarding.
+- Add frontend tests (e.g., components/contexts) or backend tests (routes/controllers/utils).
+- Enhance error handling, validations, or UX polish.
+- Expand AI prompts/agents or add safety/guardrails.
+- Improve accessibility or responsiveness.
+- Add CI checks or Docker dev setup.
+
+---
+
+## 🧭 Project flow (conceptual)
+
+1. Auth -> JWT -> protected routes.
+2. Dashboard fetches schedule/adherence via API.
+3. Medication CRUD updates MongoDB.
+4. Scheduler + Socket.IO deliver reminders.
+5. AI routes call LangChain handlers for health Q&A.
+6. Reports are parsed and analyzed; chat endpoint uses the analyzed context.
+7. Optional calendar sync pushes schedules to Google Calendar.
+
+---
+
+## 📜 License
+
+Open-source. See `LICENSE` for details.
+
+---
+
+## 📣 Community & support
+
+- Open an issue or discussion with questions or proposals.
+- PRs welcome—please keep them focused and well-described.
+- For security issues, privately disclose first; do not file public issues containing secrets.
+
+---
+
+## ✅ Submission notes for Social Winter of Code
+
+- Clearly open to newcomers with mentored guidance.
+- Labeled issues for ease of picking tasks.
+- Realistic, full-stack project touching frontend, backend, and AI/LLM integrations.
+- Active maintainers ready to review PRs and help contributors onboard.
