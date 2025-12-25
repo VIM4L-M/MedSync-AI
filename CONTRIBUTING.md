@@ -94,69 +94,33 @@ git remote -v
 
 ## Development Setup
 
-### Frontend Setup (React + Vite + Tailwind)
+### Frontend (React + Vite + Tailwind)
 
 ```bash
 cd client
 npm install
-npm run dev
-# App runs at http://localhost:5173
+npm run dev  # Runs at http://localhost:5173
 ```
 
-**Scripts available:**
-- `npm run dev` — Start development server
-- `npm run build` — Build for production
-- `npm run preview` — Preview production build locally
-- `npm run lint` — Run ESLint
+**Available scripts:** `dev`, `build`, `preview`, `lint`
 
-### Backend Setup (Express.js + MongoDB)
+### Backend (Express.js + MongoDB)
 
 ```bash
 cd server
 npm install
+
+# Create .env file (see SECURITY.md for all required variables)
+# Minimum required: MONGO_URI, JWT_SECRET, and LLM API keys
+
+npm run dev  # Server runs at http://localhost:8080
 ```
 
-**Create `.env` file** in the `server/` directory with the following variables:
-
-```env
-# Server
-PORT=8080
-
-# Database
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/dbname?retryWrites=true&w=majority
-
-# Authentication
-JWT_SECRET=your_jwt_secret_key_here
-
-# LLM APIs
-GROQ_API_KEY=your_groq_api_key
-GEMINI_API_KEY=your_gemini_api_key
-HUGGINGFACEHUB_API_KEY=your_huggingface_key
-
-# Google OAuth (for Calendar sync)
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-GOOGLE_REDIRECT_URI=http://localhost:8080/api/oauth/callback
-
-# Report Generation (if using report service)
-REPORT_API=your_report_api_key
-REPORT_TEMPLATE_ID=5b077b23e86a4726
-```
-
-**Start the backend:**
-```bash
-npm run dev
-# Server runs at http://localhost:8080
-```
-
-**Scripts available:**
-- `npm run dev` — Start with nodemon (auto-reload on changes)
-- `npm start` — Start production server
+**Note:** Full `.env` setup details are in [SECURITY.md](SECURITY.md).
 
 ### Frontend `.env` Setup (Optional)
 
-If you need custom API endpoints, create `client/.env`:
-
+Create `client/.env` if needed:
 ```env
 VITE_API_BASE_URL=http://localhost:8080
 VITE_SOCKET_URL=http://localhost:8080
@@ -330,413 +294,174 @@ git push origin feature/your-feature-name
 
 ### Code Style
 
-#### Frontend (React/JavaScript)
+**Frontend (React):**
+- Functional components with hooks
+- camelCase for variables/functions, PascalCase for components
+- Descriptive names
 
-- Use **functional components** with hooks
-- Use **camelCase** for variables and functions
-- Use **PascalCase** for component names
-- Use **descriptive variable names**
-
-**Example:**
-
-```jsx
-// Good ✓
-const MedicationCard = ({ medication, onDelete }) => {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleDelete = async () => {
-    setIsLoading(true);
-    try {
-      await deleteMedication(medication.id);
-    } catch (error) {
-      console.error('Failed to delete medication', error);
-    }
-  };
-
-  return (
-    <div className="medication-card">
-      <h3>{medication.name}</h3>
-      <button onClick={handleDelete}>Delete</button>
-    </div>
-  );
-};
-
-// Bad ✗
-const med_card = ({ m, del }) => {
-  const [loading, setLoading] = useState(false);
-  // ...
-};
-```
-
-#### Backend (Node.js/Express)
-
-- Use **camelCase** for variables and functions
-- Use **PascalCase** for classes and mongoose models
-- Use **SCREAMING_SNAKE_CASE** for constants
-- Add **JSDoc comments** for functions
+**Backend (Node.js):**
+- camelCase for variables/functions, PascalCase for models
+- SCREAMING_SNAKE_CASE for constants
+- JSDoc comments for functions
 
 **Example:**
-
 ```javascript
 // Good ✓
 const MAX_RETRIES = 3;
-const JWT_EXPIRY = '24h';
 
-/**
- * Fetch all medications for a user
- * @param {string} userId - The user's ID
- * @returns {Promise<Array>} Array of medication documents
- * @throws {Error} If database query fails
- */
 async function getUserMedications(userId) {
-  try {
-    const medications = await Medicine.find({ userId });
-    return medications;
-  } catch (error) {
-    console.error('Error fetching medications:', error);
-    throw error;
-  }
+  return await Medicine.find({ userId });
 }
 
 // Bad ✗
 async function get_meds(user_id) {
-  // No documentation, no error handling
   return Medicine.find({ userId: user_id });
 }
 ```
 
-### Commit Message Guidelines
+### Commit Messages
 
-Use clear, descriptive commit messages:
+Format: `type: subject`
+
+**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
 ```
-feat: Add email notification for medication reminders
-      
-- Implement email service integration
-- Add notification preference to user model
-- Update notification controller to send emails
+feat: Add email notifications for reminders
+
+- Implement email service
+- Add user preferences
+- Update notification controller
 
 Closes #123
 ```
 
-**Format:** `type(scope): subject`
-
-**Types:**
-- `feat:` — New feature
-- `fix:` — Bug fix
-- `docs:` — Documentation
-- `style:` — Code formatting (no logic changes)
-- `refactor:` — Code refactoring
-- `test:` — Adding/updating tests
-- `chore:` — Build, dependencies, configuration
-
 ### Error Handling
 
-Always implement proper error handling:
+**Always handle errors properly:**
 
-**Frontend:**
-```jsx
+```javascript
+// Frontend
 try {
   const data = await fetchMedications();
-  setMedications(data);
 } catch (error) {
-  toast.error('Failed to load medications: ' + error.message);
-  console.error(error);
+  toast.error('Failed to load: ' + error.message);
 }
-```
 
-**Backend:**
-```javascript
-app.post('/api/medicines', async (req, res) => {
-  try {
-    const { name, dosage } = req.body;
-    
-    if (!name || !dosage) {
-      return res.status(400).json({ error: 'Name and dosage required' });
-    }
-    
-    const medicine = new Medicine({ name, dosage });
-    await medicine.save();
-    
-    res.json(medicine);
-  } catch (error) {
-    console.error('Medicine creation error:', error);
-    res.status(500).json({ error: 'Failed to create medicine' });
-  }
-});
-```
-
-### Comments and Documentation
-
-- Write comments for **why**, not **what**
-- Keep comments up-to-date with code changes
-- Use JSDoc for functions and components
-
-```javascript
-// Why: Retry logic is needed because the Google API occasionally times out
-const MAX_RETRIES = 3;
-
-// Bad: This function gets the user
-function getUser(id) { ... }
-
-// Good: Fetch user by ID with caching to reduce database queries
-function getUserById(id) { ... }
+// Backend
+try {
+  const medicine = await Medicine.create(req.body);
+  res.json(medicine);
+} catch (error) {
+  console.error('Error:', error);
+  res.status(500).json({ error: 'Operation failed' });
+}
 ```
 
 ---
 
 ## Testing
 
-### Frontend Testing
+### Automated Tests
 
-Currently, the frontend doesn't have automated tests set up. Contributors are welcome to:
-- Add Jest + React Testing Library setup
-- Write tests for key components and contexts
-- Test user authentication flows
-
-### Backend Testing
-
-Currently, the backend doesn't have a test suite. Contributors can:
-- Set up Jest for backend tests
-- Write tests for API routes
-- Add tests for controller logic and utilities
-
-**Example test structure** (once tests are added):
-
-```bash
-npm test                  # Run all tests
-npm run test:watch       # Watch mode
-npm run test:coverage    # Generate coverage report
-```
+Currently, no automated tests exist. **Contributors welcome to:**
+- Set up Jest + React Testing Library (frontend)
+- Add backend API tests
+- Write tests for components and utilities
 
 ### Manual Testing Checklist
 
-Before submitting a PR, test the following:
-
 **Frontend:**
-- [ ] App loads without console errors
-- [ ] Login/Signup flow works
-- [ ] Protected routes redirect unauthenticated users
-- [ ] Medication CRUD operations work
-- [ ] Real-time notifications display correctly
-- [ ] Report upload and analysis works
-- [ ] Responsive design works on mobile
+- [ ] App loads without errors
+- [ ] Login/Signup works
+- [ ] Medication CRUD works
+- [ ] Real-time notifications work
+- [ ] Responsive on mobile
 
 **Backend:**
-- [ ] All API endpoints return correct status codes
-- [ ] Authentication middleware protects routes
-- [ ] Database operations (CRUD) work correctly
-- [ ] Error responses are properly formatted
-- [ ] Socket.IO notifications are sent correctly
+- [ ] API endpoints return correct codes
+- [ ] Auth middleware protects routes
+- [ ] Database operations work
+- [ ] Socket.IO notifications work
 
 ---
 
 ## Submitting Changes
 
-### Pull Request Checklist
+### Before submitting your PR:
 
-Before submitting your PR, ensure:
-
-- [ ] Branch is created from latest `main`
+- [ ] Branch from latest `main`
 - [ ] Code follows style guidelines
-- [ ] No console errors or warnings
-- [ ] Descriptive commit messages
-- [ ] PR title and description are clear
-- [ ] Related issues are referenced
-- [ ] Screenshots added (if UI changes)
-- [ ] No sensitive data (API keys, passwords) in commits
+- [ ] No console errors/warnings
+- [ ] Clear commit messages
+- [ ] Related issues referenced
+- [ ] Screenshots (if UI changes)
+- [ ] No secrets in commits
 
-### PR Template Example
+### What to expect:
 
-```markdown
-## Description
-Brief description of what this PR does.
-
-## Type of Change
-- [ ] New feature
-- [ ] Bug fix
-- [ ] Breaking change
-- [ ] Documentation update
-
-## Related Issues
-Closes #123
-
-## How to Test
-1. Step 1
-2. Step 2
-3. Verify expected behavior
-
-## Screenshots (if applicable)
-Include before/after screenshots for UI changes.
-
-## Checklist
-- [ ] My code follows the style guidelines
-- [ ] I've tested this locally
-- [ ] No new warnings or errors
-```
-
-### What to Expect
-
-- Maintainers will review your PR within 3-7 days
-- Feedback will be provided if changes are needed
-- Once approved, your PR will be merged and credited
+Maintainers review PRs within 3-7 days. Feedback provided if changes needed.
 
 ---
 
 ## Common Development Tasks
 
-### Adding a New API Endpoint
+### Add New API Endpoint
 
-1. **Create a controller** in `server/src/api/yourFeatureController.js`:
-
+1. **Controller** (`server/src/api/yourController.js`):
 ```javascript
 export const getYourFeature = async (req, res) => {
-  try {
-    const data = await YourModel.find({ userId: req.user.id });
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  const data = await YourModel.find({ userId: req.user.id });
+  res.json(data);
 };
 ```
 
-2. **Create/update a route** in `server/src/routes/yourRoutes.js`:
-
+2. **Route** (`server/src/routes/yourRoutes.js`):
 ```javascript
-import express from 'express';
-import { getYourFeature } from '../api/yourFeatureController.js';
+import { getYourFeature } from '../api/yourController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
-
-const router = express.Router();
-
 router.get('/feature', authMiddleware, getYourFeature);
-
-export default router;
 ```
 
-3. **Register the route** in `server/src/index.js`:
-
+3. **Register** in `server/src/index.js`:
 ```javascript
 import yourRoutes from './routes/yourRoutes.js';
 app.use('/api', yourRoutes);
 ```
 
-4. **Call the endpoint from frontend**:
+### Add New Page
 
-```javascript
-const response = await fetch('http://localhost:8080/api/feature', {
-  headers: { Authorization: `Bearer ${token}` }
-});
-```
-
-### Adding a New Page Component
-
-1. **Create the page** in `client/src/pages/YourPage.jsx`:
-
+1. Create `client/src/pages/YourPage.jsx`
+2. Add route in `client/src/App.jsx`:
 ```jsx
-import { useContext } from 'react';
-import { MedicationContext } from '../context/medicationContext';
-
-const YourPage = () => {
-  const { medications } = useContext(MedicationContext);
-
-  return (
-    <div className="page-container">
-      <h1>Your Page Title</h1>
-      {/* Page content */}
-    </div>
-  );
-};
-
-export default YourPage;
+<Route path="/your-page" element={<ProtectedRoute><YourPage /></ProtectedRoute>} />
 ```
 
-2. **Add routing** in `client/src/App.jsx`:
+### Add MongoDB Model
 
-```jsx
-import YourPage from './pages/YourPage';
-
-function App() {
-  return (
-    <Routes>
-      {/* ... other routes */}
-      <Route path="/your-page" element={<ProtectedRoute><YourPage /></ProtectedRoute>} />
-    </Routes>
-  );
-}
-```
-
-### Working with MongoDB Models
-
-**Create a model** in `server/src/models/YourModel.js`:
-
+Create `server/src/models/YourModel.js`:
 ```javascript
 import mongoose from 'mongoose';
 
-const yourSchema = new mongoose.Schema({
+const schema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   name: { type: String, required: true },
-  description: String,
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now }
 });
 
-export default mongoose.model('YourModel', yourSchema);
+export default mongoose.model('YourModel', schema);
 ```
 
 ---
 
 ## Troubleshooting
 
-### Common Issues
-
-#### Port Already in Use
-
-**Problem:** `Error: listen EADDRINUSE: address already in use :::8080`
-
-**Solution:**
-```bash
-# Find process using port 8080
-lsof -i :8080
-
-# Kill the process
-kill -9 <PID>
-```
-
-#### MongoDB Connection Failed
-
-**Problem:** `MongooseError: Cannot connect to MongoDB`
-
-**Solution:**
-- Verify `MONGO_URI` in `.env` is correct
-- Check MongoDB is running (if local)
-- Ensure IP whitelist in MongoDB Atlas (if cloud)
-
-#### CORS Errors
-
-**Problem:** `Access to XMLHttpRequest blocked by CORS policy`
-
-**Solution:**
-- Ensure `VITE_API_BASE_URL` in `client/.env` matches backend URL
-- Check CORS configuration in `server/src/index.js`
-
-#### Missing Dependencies
-
-**Problem:** `Cannot find module 'xyz'`
-
-**Solution:**
-```bash
-cd client && npm install   # or cd server && npm install
-```
-
-#### Socket.IO Not Connecting
-
-**Problem:** Socket.IO connection times out
-
-**Solution:**
-- Verify `VITE_SOCKET_URL` matches backend address
-- Check Socket.IO is initialized in `server/src/index.js`
-- Ensure backend is running before frontend
+| Issue | Solution |
+|-------|----------|
+| Port in use | `lsof -i :8080` then `kill -9 <PID>` |
+| MongoDB connection failed | Check `MONGO_URI` in `.env`, verify IP whitelist |
+| CORS errors | Match `VITE_API_BASE_URL` to backend, check CORS config |
+| Missing dependencies | `npm install` in client/server |
+| Socket.IO not connecting | Verify `VITE_SOCKET_URL`, ensure backend runs first |
 
 ---
 
