@@ -142,8 +142,9 @@ class TranslationService {
         `https://translation.googleapis.com/language/translate/v2`,
         {
           q: textToTranslate,
-          source_language: sourceLang,
-          target_language: targetLang,
+          source: sourceLang,
+          target: targetLang,
+          format: 'text',
         },
         {
           params: {

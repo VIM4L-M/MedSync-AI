@@ -276,6 +276,35 @@ Install dependencies with `npm install` in the `server/` directory (includes `sy
 
 ---
 
+## Multilingual Phase 4 (Backend API Endpoints)
+
+Phase 4 exposes translation, language preference, and report readability/translation APIs:
+
+- **Translation API** (`/api/translate`):
+  - `POST /api/translate` — Translate a single text (`text`, `targetLanguage`, `context` = medical/general).
+  - `POST /api/translate/batch` — Batch translate array `texts[]` to `targetLanguage`.
+  - `GET /api/translate/supported` — List supported languages.
+
+- **Language Preference API** (`/api/languages`):
+  - `GET /api/languages/user` — Fetch user preferred language + supported list.
+  - `PUT /api/languages/user` — Update preferred language (body: `{ language }`).
+  - `GET /api/languages/supported` — List supported languages.
+
+- **Report Analysis & Readability** (`/api/report`):
+  - `POST /api/report/analyze` — Analyze an uploaded report; saves analysis with readability + optional translation (uses `language` param or user preference).
+  - `POST /api/report/chat` — Chat over a stored report (requires `reportId`, `question`).
+  - `GET /api/report/:id/translate/:language` — On-demand translation of stored analysis with caching in the document.
+  - `GET /api/report/:id/readability` — Returns readability metrics; backfills if missing.
+
+- **Behavior**:
+  - Auto-detects source language; auto-translates to requested language or user preference when provided.
+  - Stores `translatedAnalysis`, `originalLanguage`, and `readabilityScore` in Report documents.
+  - Graceful fallbacks: translation errors return original text; readability always returns a score.
+
+Run `npm install` in `server/` if you haven’t added dependencies yet.
+
+---
+
 ## 🤝 How to contribute
 
 1. **Pick an issue:** Start with “good first issue” or “help wanted,” or open a discussion if unsure.
