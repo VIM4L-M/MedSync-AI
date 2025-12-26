@@ -139,10 +139,23 @@ GOOGLE_REDIRECT_URI=your_redirect_uri
 
 REPORT_API=your_report_service_api_key
 REPORT_TEMPLATE_ID=5b077b23e86a4726
+
+# Multilingual & Translation (Phase 2)
+GOOGLE_TRANSLATE_API_KEY=your_google_translate_api_key
+TRANSLATION_CACHE_TTL=86400
+DEFAULT_LANGUAGE=en
+SUPPORTED_LANGUAGES=en,es,hi
+TRANSLATION_PROVIDER=google
 ```
 If you use report-generation/analysis services, add those keys/IDs here too.
 
 **Security note:** Never commit real keys. If any were exposed, rotate them immediately and scrub from history.
+
+**Translation setup:**
+- Obtain a Google Translate API key from [Google Cloud Console](https://console.cloud.google.com/).
+- Add `GOOGLE_TRANSLATE_API_KEY` to your `.env` file.
+- `TRANSLATION_CACHE_TTL`: Cache duration in seconds (default 86400 = 24 hours).
+- `TRANSLATION_PROVIDER`: Currently supports `google` (libretranslate support coming in Phase 2.2).
 
 ### Frontend `.env` (client)
 Add a `client/.env` to point the React app at your backend and OAuth endpoints:
@@ -191,6 +204,26 @@ db.medications.updateMany(
 ```
 
 These changes complete Phase 1 of the multilingual implementation plan and keep existing data intact.
+
+## Multilingual Phase 2 (Translation Service Integration)
+
+Phase 2 provides translation capabilities for multilingual content:
+
+- **Translation Service** (`server/src/services/translationService.js`): Wraps Google Translate API with caching (via node-cache), batch translation, language detection, retry logic, and medical terminology preservation.
+- **Language Configuration** (`server/src/utils/languageConfig.js`): Central configuration for supported languages (English, Spanish, Hindi) with utilities for validation and reading level mappings.
+- **Medical Terminology Dictionary** (`server/src/utils/medicalTerminology.js`): Maps medical terms to accurate translations across languages (e.g., ibuprofen → ibuprofeno/इबुप्रोफेन), ensuring clinical accuracy.
+- **Translation Service API**:
+  - `translateText(text, targetLang, context)` — Translate a single text.
+  - `translateBatch(texts[], targetLang)` — Batch translate multiple texts.
+  - `detectLanguage(text)` — Detect the language of given text.
+  - `getSupportedLanguages()` — List supported languages.
+  - `invalidateCache(key)` — Clear cache for a specific key or all.
+
+- **Caching**: Translations are cached with a TTL to reduce API calls (default 24 hours, configurable via `TRANSLATION_CACHE_TTL`).
+- **Error handling**: Translation failures gracefully fall back to the original text; no crashes.
+- **Medical Context**: When translating medical content, the service preserves medical terminology and can apply specialized dictionaries for accuracy.
+
+Install dependencies with `npm install` in the `server/` directory after adding Phase 2 files.
 
 ---
 
