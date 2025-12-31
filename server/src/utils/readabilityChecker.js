@@ -340,7 +340,6 @@ class ReadabilityChecker {
 
     // Hindi Devanagari script consideration
     const devanagariVowels = 'अआइईउऊऋएऐओऔ';
-    const devanagariVowelMarks = 'ािीुूृेैोौ';
 
     // Count vowel sounds (full vowels + vowel marks)
     let syllableCount = 0;
