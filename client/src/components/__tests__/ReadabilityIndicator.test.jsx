@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import ReadabilityIndicator from '../../ReadabilityIndicator';
+import ReadabilityIndicator from '../ReadabilityIndicator.jsx';
 
 describe('ReadabilityIndicator Component', () => {
   describe('rendering', () => {
