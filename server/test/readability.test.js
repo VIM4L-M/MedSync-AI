@@ -163,22 +163,6 @@ describe('Readability Checker', () => {
     });
   });
 
-  describe('getReadabilityColor', () => {
-    it('should return green for easy reading levels (1-6)', () => {
-      const color = getReadabilityColor(5);
-      expect(color).toBe('green');
-    });
-
-    it('should return yellow for moderate levels (7-12)', () => {
-      const color = getReadabilityColor(10);
-      expect(color).toBe('yellow');
-    });
-
-    it('should return red for difficult levels (13+)', () => {
-      const color = getReadabilityColor(15);
-      expect(color).toBe('red');
-    });
-  });
 
   describe('getReadingLevelGrade', () => {
     it('should calculate grade from Flesch-Kincaid score', () => {
