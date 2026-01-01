@@ -5,9 +5,7 @@ import startNotificationScheduler from "./notificationController.js";
 
 export const addMedication = async (req, res) => {
   try {
-    console.log("Request body:", req.body);
     const{medication,localuser}=req.body;
-    console.log("medicine",medication);
     const {
       pillName,
       pillDescription,
@@ -43,16 +41,26 @@ export const addMedication = async (req, res) => {
     await sampleMedicine.save();
 
     // Schedule in Google Calendar
-    await addMedicineToGoogleCalendar(userId, sampleMedicine);
+    let calendarSyncStatus = { success: false, message: "Sync not attempted" };
+    try {
+      calendarSyncStatus = await addMedicineToGoogleCalendar(localuser.id, sampleMedicine);
+    } catch (calendarError) {
+      console.error(`[Add Medicine] Google Calendar sync failed:`, calendarError.message);
+      calendarSyncStatus = {
+        success: false,
+        message: `Calendar sync failed: ${calendarError.message}`,
+        error: calendarError.message
+      };
+    }
     
     // ✅ Restart notification scheduler with updated medications
-    console.log("🔄 Restarting notification scheduler after adding new medicine...");
     startNotificationScheduler({ user: { id: localuser.id, name: localuser.name, email: localuser.email } });
     
     return res.status(201).json({
       success: true,
       message: "Medication saved successfully",
-      data: sampleMedicine
+      data: sampleMedicine,
+      calendarSync: calendarSyncStatus
     });
 
   } catch (error) {
